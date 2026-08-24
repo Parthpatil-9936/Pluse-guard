@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #0A0D14;
+    color: #F8FAFC;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+}
+
+.clinical-panel {
+  background: rgba(18, 24, 36, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pulse-green-glow {
+  box-shadow: 0 0 15px -3px rgba(16, 185, 129, 0.4);
+}
+.pulse-yellow-glow {
+  box-shadow: 0 0 20px -3px rgba(245, 158, 11, 0.5);
+}
+.pulse-red-glow {
+  box-shadow: 0 0 25px -2px rgba(239, 68, 68, 0.7);
+  animation: alarmPulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate;
+}
+
+@keyframes alarmPulse {
+  0% { border-color: rgba(239, 68, 68, 0.4); box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+  100% { border-color: rgba(239, 68, 68, 1); box-shadow: 0 0 30px rgba(239, 68, 68, 0.8); }
+}
