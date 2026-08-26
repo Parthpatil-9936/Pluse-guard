@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BedState } from '../types';
 import { BedCard3D } from './BedCard3D';
+import { Filter, AlertOctagon, Activity, CheckCircle } from 'lucide-react';
 
 interface BedGridProps {
   beds: Record<string, BedState>;
@@ -9,20 +10,86 @@ interface BedGridProps {
 }
 
 export const BedGrid: React.FC<BedGridProps> = ({ beds, selectedBedId, onSelectBed }) => {
+  const [filter, setFilter] = useState<'all' | 'critical' | 'anomaly' | 'normal'>('all');
+
   const bedKeys = Array.from({ length: 10 }, (_, i) => `bed-${String(i + 1).padStart(2, '0')}`);
 
+  const filteredBedKeys = bedKeys.filter((bedId) => {
+    const bed = beds[bedId];
+    if (filter === 'critical') return bed?.tier === 1;
+    if (filter === 'anomaly') return bed?.tier === 2;
+    if (filter === 'normal') return bed?.tier === 3 || !bed?.tier;
+    return true;
+  });
+
+  const critCount = bedKeys.filter((b) => beds[b]?.tier === 1).length;
+  const anomCount = bedKeys.filter((b) => beds[b]?.tier === 2).length;
+
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-mono font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-          <span>10-Bed Triage Monitor Matrix (2x5 Grid)</span>
-        </h2>
-        <span className="text-xs text-slate-500 font-mono">Select bed to inspect live vitals</span>
+    <div className="space-y-3.5">
+      {/* Grid Top Bar with Filters & Ward Info */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-2xl border border-slate-800 backdrop-blur-md">
+        <div className="flex items-center space-x-2.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
+          <h2 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+            10-Bed Clinical Telemetry Matrix (2x5 Grid)
+          </h2>
+        </div>
+
+        {/* Filter Pills */}
+        <div className="flex items-center space-x-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-mono">
+          <button
+            onClick={() => setFilter('all')}
+            className={`px-2.5 py-1 rounded-lg transition-all ${
+              filter === 'all'
+                ? 'bg-slate-800 text-white font-bold'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            All (10)
+          </button>
+
+          <button
+            onClick={() => setFilter('critical')}
+            className={`px-2.5 py-1 rounded-lg transition-all flex items-center space-x-1 ${
+              filter === 'critical'
+                ? 'bg-red-600 text-white font-bold shadow-md shadow-red-900/50'
+                : 'text-red-400 hover:bg-red-950/40'
+            }`}
+          >
+            <AlertOctagon className="w-3 h-3" />
+            <span>Tier-1 ({critCount})</span>
+          </button>
+
+          <button
+            onClick={() => setFilter('anomaly')}
+            className={`px-2.5 py-1 rounded-lg transition-all flex items-center space-x-1 ${
+              filter === 'anomaly'
+                ? 'bg-amber-600 text-white font-bold'
+                : 'text-amber-400 hover:bg-amber-950/40'
+            }`}
+          >
+            <Activity className="w-3 h-3" />
+            <span>Tier-2 ({anomCount})</span>
+          </button>
+
+          <button
+            onClick={() => setFilter('normal')}
+            className={`px-2.5 py-1 rounded-lg transition-all flex items-center space-x-1 ${
+              filter === 'normal'
+                ? 'bg-emerald-600 text-white font-bold'
+                : 'text-emerald-400 hover:bg-emerald-950/40'
+            }`}
+          >
+            <CheckCircle className="w-3 h-3" />
+            <span>Normal</span>
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3.5">
-        {bedKeys.map((bedId) => {
+      {/* 2x5 Bed Grid Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
+        {filteredBedKeys.map((bedId) => {
           const bedState = beds[bedId] || {
             bed_id: bedId,
             signal_status: 'no_signal',
@@ -30,7 +97,7 @@ export const BedGrid: React.FC<BedGridProps> = ({ beds, selectedBedId, onSelectB
             alert: null,
             tier: 3,
             suppressed: true,
-            history: []
+            history: [],
           };
 
           return (
