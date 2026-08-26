@@ -261,9 +261,10 @@ export function App() {
   ).length;
 
   return (
-    <div className="min-h-screen bg-[#070B12] text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
+    <div className="min-h-screen bg-[#E2E8F0] text-slate-900 flex flex-col font-sans selection:bg-teal-200 selection:text-teal-950">
       {/* Header Bar */}
       <Header
+
         cloudOnline={cloudOnline}
         onToggleCloudOutage={handleToggleCloudOutage}
         suppressionRate={suppressionRate}
@@ -277,8 +278,32 @@ export function App() {
 
       {/* Main Command Center Layout */}
       <main className="flex-1 p-4 sm:p-6 space-y-6 max-w-[1720px] w-full mx-auto">
+        {/* Cloud Outage Edge Failover Banner */}
+        {!cloudOnline && (
+          <div className="bg-amber-50 border border-amber-300 p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-amber-900 shadow-sm animate-fadeIn">
+            <div className="flex items-center space-x-3">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping" />
+              <div>
+                <span className="text-xs font-mono font-bold uppercase tracking-wider block">
+                  ⚡ Autonomous Edge Resilience Mode Active
+                </span>
+                <p className="text-[11px] text-amber-800">
+                  Cloud uplink is simulated offline. Local Edge Gateway is actively processing all 10 patient telemetry streams &amp; bedside alarms locally. Events are safely queued for store-and-forward sync.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleToggleCloudOutage}
+              className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-mono font-bold shadow-xs transition-all"
+            >
+              Restore Cloud Link
+            </button>
+          </div>
+        )}
+
         {/* VIEW MODE 1: FULL 3D WARD ROOM VIEW */}
         {viewMode === '3d' && (
+
           <div className="space-y-6 animate-fadeIn">
             <ICUWard3D
               beds={beds}

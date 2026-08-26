@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { TierType } from '../../types';
+import { THEME } from '../../theme';
 
 interface BiometricHeart3DProps {
   hr: number;
@@ -35,16 +36,16 @@ export const BiometricHeart3D: React.FC<BiometricHeart3DProps> = ({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
-    // Color based on tier and signal
-    let baseColor = new THREE.Color(0x00d6ff);
+    // Color based on tier and signal from centralized theme
+    let baseColor = new THREE.Color(THEME.three.tealAccent);
     if (isSignalLost) {
-      baseColor = new THREE.Color(0x64748b);
+      baseColor = new THREE.Color(THEME.three.offline);
     } else if (tier === 1) {
-      baseColor = new THREE.Color(0xef4444);
+      baseColor = new THREE.Color(THEME.three.tier1);
     } else if (tier === 2) {
-      baseColor = new THREE.Color(0xf59e0b);
+      baseColor = new THREE.Color(THEME.three.tier2);
     } else {
-      baseColor = new THREE.Color(0x10b981);
+      baseColor = new THREE.Color(THEME.three.tier3);
     }
 
     // Group for entire heart system
@@ -57,9 +58,9 @@ export const BiometricHeart3D: React.FC<BiometricHeart3DProps> = ({
       color: baseColor,
       wireframe: true,
       emissive: baseColor,
-      emissiveIntensity: 0.6,
-      roughness: 0.2,
-      metalness: 0.8,
+      emissiveIntensity: 0.45,
+      roughness: 0.3,
+      metalness: 0.7,
     });
     const coreMesh = new THREE.Mesh(coreGeometry, coreMaterial);
     heartGroup.add(coreMesh);
@@ -69,9 +70,9 @@ export const BiometricHeart3D: React.FC<BiometricHeart3DProps> = ({
     const innerMaterial = new THREE.MeshStandardMaterial({
       color: baseColor,
       emissive: baseColor,
-      emissiveIntensity: 0.9,
+      emissiveIntensity: 0.65,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.65,
       roughness: 0.3,
     });
     const innerMesh = new THREE.Mesh(innerGeometry, innerMaterial);
@@ -82,7 +83,7 @@ export const BiometricHeart3D: React.FC<BiometricHeart3DProps> = ({
       color: baseColor,
       wireframe: true,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.4,
     });
 
     const ring1 = new THREE.Mesh(new THREE.TorusGeometry(1.4, 0.02, 16, 64), ringMaterial);
@@ -94,7 +95,7 @@ export const BiometricHeart3D: React.FC<BiometricHeart3DProps> = ({
     heartGroup.add(ring2);
 
     // 4. Particle Cloud
-    const particleCount = 70;
+    const particleCount = 60;
     const particleGeometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
 
@@ -111,16 +112,16 @@ export const BiometricHeart3D: React.FC<BiometricHeart3DProps> = ({
       color: baseColor,
       size: 0.04,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.5,
     });
     const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
     heartGroup.add(particleSystem);
 
     // Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
     scene.add(ambientLight);
 
-    const pointLight = new THREE.PointLight(baseColor, 2, 10);
+    const pointLight = new THREE.PointLight(baseColor, 1.4, 10);
     pointLight.position.set(2, 2, 3);
     scene.add(pointLight);
 
@@ -184,14 +185,14 @@ export const BiometricHeart3D: React.FC<BiometricHeart3DProps> = ({
       const pulseFrequency = beatsPerSec * Math.PI * 2;
 
       const rawPulse = Math.sin(elapsedTime * pulseFrequency);
-      const beatScale = 1 + Math.max(0, Math.pow(rawPulse, 5)) * 0.28;
+      const beatScale = 1 + Math.max(0, Math.pow(rawPulse, 5)) * 0.25;
 
       coreMesh.scale.set(beatScale, beatScale, beatScale);
       innerMesh.scale.set(beatScale * 0.9, beatScale * 0.9, beatScale * 0.9);
 
       if (tier === 1 && !isSignalLost) {
-        heartGroup.position.x = (Math.random() - 0.5) * 0.04;
-        heartGroup.position.y = (Math.random() - 0.5) * 0.04;
+        heartGroup.position.x = (Math.random() - 0.5) * 0.03;
+        heartGroup.position.y = (Math.random() - 0.5) * 0.03;
       } else {
         heartGroup.position.set(0, 0, 0);
       }
@@ -229,27 +230,28 @@ export const BiometricHeart3D: React.FC<BiometricHeart3DProps> = ({
   }, [hr, spo2, tier, isSignalLost]);
 
   return (
-    <div className="relative w-full h-44 flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-slate-950/80 to-slate-900/60 border border-slate-800/80 shadow-inner group">
+    <div className="relative w-full h-44 flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100/90 border border-slate-200 shadow-sm group">
       <div ref={containerRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
 
       {/* Overlay Readout */}
       <div className="absolute top-2.5 left-3 pointer-events-none">
-        <span className="text-[9px] font-mono uppercase tracking-widest text-slate-400 block">
+        <span className="text-[9px] font-mono uppercase tracking-widest text-slate-500 font-semibold block">
           3D Biometric Hologram
         </span>
-        <span className="text-xs font-mono font-bold text-slate-200">
+        <span className="text-xs font-mono font-bold text-slate-800">
           {isSignalLost ? 'TELEMETRY DISCONNECTED' : `${hr} BPM PULSE`}
         </span>
       </div>
 
-      <div className="absolute top-2.5 right-3 pointer-events-none text-[9px] font-mono text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute top-2.5 right-3 pointer-events-none text-[9px] font-mono text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
         🖱️ Drag to rotate
       </div>
 
-      <div className="absolute bottom-2 right-3 pointer-events-none flex items-center space-x-1.5 bg-slate-950/80 px-2 py-0.5 rounded-md border border-slate-800 text-[9px] font-mono text-cyan-400">
-        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
-        <span>SpO2: {spo2}%</span>
+      <div className="absolute bottom-2 right-3 pointer-events-none flex items-center space-x-1.5 bg-white/95 px-2 py-0.5 rounded-md border border-slate-200 text-[9px] font-mono text-teal-700 shadow-sm">
+        <span className="w-1.5 h-1.5 rounded-full bg-teal-600 animate-ping" />
+        <span className="font-semibold">SpO2: {spo2}%</span>
       </div>
     </div>
   );
 };
+

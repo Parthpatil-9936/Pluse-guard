@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BedState } from '../types';
 import { BedCard3D } from './BedCard3D';
+import { THEME } from '../theme';
 import { Filter, AlertOctagon, Activity, CheckCircle } from 'lucide-react';
 
 interface BedGridProps {
@@ -28,22 +29,22 @@ export const BedGrid: React.FC<BedGridProps> = ({ beds, selectedBedId, onSelectB
   return (
     <div className="space-y-3.5">
       {/* Grid Top Bar with Filters & Ward Info */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-2xl border border-slate-800 backdrop-blur-md">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white/90 p-3 rounded-2xl border border-slate-300 backdrop-blur-md shadow-sm">
         <div className="flex items-center space-x-2.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
-          <h2 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+          <span className="w-2.5 h-2.5 rounded-full bg-teal-600 animate-ping" />
+          <h2 className="text-xs font-mono font-bold text-slate-800 uppercase tracking-wider">
             10-Bed Clinical Telemetry Matrix (2x5 Grid)
           </h2>
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center space-x-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs font-mono">
+        <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-mono">
           <button
             onClick={() => setFilter('all')}
             className={`px-2.5 py-1 rounded-lg transition-all ${
               filter === 'all'
-                ? 'bg-slate-800 text-white font-bold'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-teal-600 text-white font-bold shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             All (10)
@@ -53,8 +54,8 @@ export const BedGrid: React.FC<BedGridProps> = ({ beds, selectedBedId, onSelectB
             onClick={() => setFilter('critical')}
             className={`px-2.5 py-1 rounded-lg transition-all flex items-center space-x-1 ${
               filter === 'critical'
-                ? 'bg-red-600 text-white font-bold shadow-md shadow-red-900/50'
-                : 'text-red-400 hover:bg-red-950/40'
+                ? 'bg-red-600 text-white font-bold shadow-xs'
+                : 'text-red-700 hover:bg-red-50'
             }`}
           >
             <AlertOctagon className="w-3 h-3" />
@@ -65,8 +66,8 @@ export const BedGrid: React.FC<BedGridProps> = ({ beds, selectedBedId, onSelectB
             onClick={() => setFilter('anomaly')}
             className={`px-2.5 py-1 rounded-lg transition-all flex items-center space-x-1 ${
               filter === 'anomaly'
-                ? 'bg-amber-600 text-white font-bold'
-                : 'text-amber-400 hover:bg-amber-950/40'
+                ? 'bg-amber-600 text-white font-bold shadow-xs'
+                : 'text-amber-800 hover:bg-amber-50'
             }`}
           >
             <Activity className="w-3 h-3" />
@@ -77,8 +78,8 @@ export const BedGrid: React.FC<BedGridProps> = ({ beds, selectedBedId, onSelectB
             onClick={() => setFilter('normal')}
             className={`px-2.5 py-1 rounded-lg transition-all flex items-center space-x-1 ${
               filter === 'normal'
-                ? 'bg-emerald-600 text-white font-bold'
-                : 'text-emerald-400 hover:bg-emerald-950/40'
+                ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                : 'text-emerald-800 hover:bg-emerald-50'
             }`}
           >
             <CheckCircle className="w-3 h-3" />
@@ -113,3 +114,4 @@ export const BedGrid: React.FC<BedGridProps> = ({ beds, selectedBedId, onSelectB
     </div>
   );
 };
+

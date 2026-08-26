@@ -12,6 +12,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { TelemetryTick } from '../types';
+import { THEME } from '../theme';
 
 ChartJS.register(
   CategoryScale,
@@ -43,27 +44,29 @@ export const VitalsChart: React.FC<VitalsChartProps> = ({ history, bedId }) => {
       {
         label: 'Heart Rate (bpm)',
         data: hrData,
-        borderColor: '#EF4444',
-        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        borderColor: THEME.colors.tier1.color,
+        backgroundColor: 'rgba(220, 38, 38, 0.08)',
         tension: 0.3,
         borderWidth: 2,
         pointRadius: 0,
         yAxisID: 'y_hr',
+        fill: true,
       },
       {
         label: 'SpO2 (%)',
         data: spo2Data,
-        borderColor: '#00D6FF',
-        backgroundColor: 'rgba(0, 214, 255, 0.08)',
+        borderColor: THEME.colors.spo2.color,
+        backgroundColor: 'rgba(2, 132, 199, 0.08)',
         tension: 0.3,
         borderWidth: 2,
         pointRadius: 0,
         yAxisID: 'y_spo2',
+        fill: true,
       },
       {
         label: 'Systolic BP (mmHg)',
         data: bpSysData,
-        borderColor: '#F59E0B',
+        borderColor: THEME.colors.tier2.color,
         backgroundColor: 'transparent',
         borderDash: [4, 4],
         tension: 0.3,
@@ -82,20 +85,25 @@ export const VitalsChart: React.FC<VitalsChartProps> = ({ history, bedId }) => {
       legend: {
         position: 'top' as const,
         labels: {
-          color: '#94A3B8',
-          font: { size: 10, family: 'monospace' },
+          color: THEME.colors.textSecondary,
+          font: { size: 10, family: 'monospace', weight: 'bold' as const },
           boxWidth: 12,
         },
       },
       tooltip: {
         mode: 'index' as const,
         intersect: false,
+        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+        titleColor: '#FFFFFF',
+        bodyColor: '#F1F5F9',
+        borderColor: '#CBD5E1',
+        borderWidth: 1,
       },
     },
     scales: {
       x: {
-        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-        ticks: { color: '#64748B', font: { size: 9, family: 'monospace' } },
+        grid: { color: 'rgba(15, 23, 42, 0.06)' },
+        ticks: { color: THEME.colors.textMuted, font: { size: 9, family: 'monospace' } },
       },
       y_hr: {
         type: 'linear' as const,
@@ -103,8 +111,8 @@ export const VitalsChart: React.FC<VitalsChartProps> = ({ history, bedId }) => {
         position: 'left' as const,
         min: 0,
         max: 220,
-        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-        ticks: { color: '#EF4444', font: { size: 9 } },
+        grid: { color: 'rgba(15, 23, 42, 0.06)' },
+        ticks: { color: THEME.colors.tier1.color, font: { size: 9, weight: 'bold' as const } },
       },
       y_spo2: {
         type: 'linear' as const,
@@ -113,7 +121,7 @@ export const VitalsChart: React.FC<VitalsChartProps> = ({ history, bedId }) => {
         min: 60,
         max: 100,
         grid: { drawOnChartArea: false },
-        ticks: { color: '#00D6FF', font: { size: 9 } },
+        ticks: { color: THEME.colors.spo2.color, font: { size: 9, weight: 'bold' as const } },
       },
     },
   };
@@ -124,3 +132,4 @@ export const VitalsChart: React.FC<VitalsChartProps> = ({ history, bedId }) => {
     </div>
   );
 };
+

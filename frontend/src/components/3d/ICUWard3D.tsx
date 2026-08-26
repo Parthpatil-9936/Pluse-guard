@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { BedState } from '../../types';
+import { THEME } from '../../theme';
 import {
   RotateCcw,
   Eye,
@@ -67,8 +68,8 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
     // 1. Scene setup
     const scene = new THREE.Scene();
     sceneRef.current = scene;
-    scene.background = new THREE.Color(0x070b12);
-    scene.fog = new THREE.FogExp2(0x070b12, 0.018);
+    scene.background = new THREE.Color(THEME.three.sceneBg);
+    scene.fog = new THREE.FogExp2(THEME.three.fogColor, 0.010);
 
     // 2. Camera setup
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.2, 300);
@@ -82,7 +83,7 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+    renderer.toneMappingExposure = 1.05;
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -102,43 +103,43 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
       isTransitioningRef.current = false;
     });
 
-    // 5. Lighting System
-    const ambientLight = new THREE.AmbientLight(0x1e293b, 1.8);
+    // 5. Medium Clinical Lighting System
+    const ambientLight = new THREE.AmbientLight(THEME.three.ambientLight, 1.4);
     scene.add(ambientLight);
 
-    const ceilingMainLight = new THREE.DirectionalLight(0xa5f3fc, 1.4);
+    const ceilingMainLight = new THREE.DirectionalLight(THEME.three.directionalLight, 1.1);
     ceilingMainLight.position.set(0, 25, 10);
     ceilingMainLight.castShadow = true;
     ceilingMainLight.shadow.mapSize.width = 2048;
     ceilingMainLight.shadow.mapSize.height = 2048;
-    ceilingMainLight.shadow.bias = -0.001;
+    ceilingMainLight.shadow.bias = -0.0008;
     scene.add(ceilingMainLight);
 
-    const blueFillLight = new THREE.DirectionalLight(0x3b82f6, 0.8);
+    const blueFillLight = new THREE.DirectionalLight(THEME.three.fillLight, 0.5);
     blueFillLight.position.set(-15, 15, -15);
     scene.add(blueFillLight);
 
     // 6. Medical Floor Architecture & Grids
     const floorGeo = new THREE.PlaneGeometry(70, 50);
     const floorMat = new THREE.MeshStandardMaterial({
-      color: 0x0c1322,
-      roughness: 0.35,
-      metalness: 0.5,
+      color: THEME.three.floorColor,
+      roughness: 0.4,
+      metalness: 0.05,
     });
     const floorMesh = new THREE.Mesh(floorGeo, floorMat);
     floorMesh.rotation.x = -Math.PI / 2;
     floorMesh.receiveShadow = true;
     scene.add(floorMesh);
 
-    // Glowing Floor Grid Lines
-    const gridHelper = new THREE.GridHelper(70, 35, 0x00d6ff, 0x1e293b);
+    // Floor Grid Lines
+    const gridHelper = new THREE.GridHelper(70, 35, THEME.three.floorGridCenter, THEME.three.floorGridLines);
     gridHelper.position.y = 0.01;
     scene.add(gridHelper);
 
-    // Ward Center Pathway Glow Strip
+    // Ward Center Pathway Guide Strip
     const aisleGeo = new THREE.PlaneGeometry(60, 2.8);
     const aisleMat = new THREE.MeshBasicMaterial({
-      color: 0x00d6ff,
+      color: THEME.three.aislePathway,
       transparent: true,
       opacity: 0.08,
       side: THREE.DoubleSide,
@@ -149,7 +150,7 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
     scene.add(aisle);
 
     // 7. Medical Telemetry Particle Dust
-    const particleCount = 200;
+    const particleCount = 180;
     const particleGeo = new THREE.BufferGeometry();
     const particlePositions = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount * 3; i += 3) {
@@ -159,10 +160,10 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
     }
     particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
     const particleMat = new THREE.PointsMaterial({
-      color: 0x38bdf8,
-      size: 0.1,
+      color: THEME.three.particles,
+      size: 0.08,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.35,
     });
     const wardParticles = new THREE.Points(particleGeo, particleMat);
     scene.add(wardParticles);
@@ -184,9 +185,9 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
       // --- A. Base Pod Floor Zone Indicator ---
       const zoneGeo = new THREE.PlaneGeometry(5.4, 4.4);
       const zoneMat = new THREE.MeshStandardMaterial({
-        color: 0x111c2e,
-        roughness: 0.6,
-        metalness: 0.2,
+        color: THEME.three.bedZoneFloor,
+        roughness: 0.5,
+        metalness: 0.1,
       });
       const zoneMesh = new THREE.Mesh(zoneGeo, zoneMat);
       zoneMesh.rotation.x = -Math.PI / 2;
@@ -194,9 +195,9 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
       zoneMesh.receiveShadow = true;
       bedGroup.add(zoneMesh);
 
-      // Bed Zone Border Glow
+      // Bed Zone Border
       const borderGeo = new THREE.EdgesGeometry(zoneGeo);
-      const borderMat = new THREE.LineBasicMaterial({ color: 0x1e293b, linewidth: 2 });
+      const borderMat = new THREE.LineBasicMaterial({ color: THEME.three.bedZoneBorder, linewidth: 2 });
       const borderMesh = new THREE.LineSegments(borderGeo, borderMat);
       borderMesh.rotation.x = -Math.PI / 2;
       borderMesh.position.y = 0.03;
@@ -205,9 +206,9 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
       // --- B. Hospital Bed Frame & Patient Mattress ---
       const frameGeo = new THREE.BoxGeometry(2.4, 0.4, 4.0);
       const frameMat = new THREE.MeshStandardMaterial({
-        color: 0x334155,
-        metalness: 0.85,
-        roughness: 0.2,
+        color: THEME.three.bedFrame,
+        metalness: 0.6,
+        roughness: 0.3,
       });
       const frame = new THREE.Mesh(frameGeo, frameMat);
       frame.position.y = 0.5;
@@ -217,7 +218,7 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
 
       // Chrome Frame Rails
       const railGeo = new THREE.CylinderGeometry(0.04, 0.04, 3.8);
-      const railMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.1 });
+      const railMat = new THREE.MeshStandardMaterial({ color: THEME.three.bedRails, metalness: 0.85, roughness: 0.15 });
 
       const leftRail = new THREE.Mesh(railGeo, railMat);
       leftRail.rotation.x = Math.PI / 2;
@@ -229,11 +230,11 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
       rightRail.position.set(1.25, 0.9, 0);
       bedGroup.add(rightRail);
 
-      // Mattress
+      // Mattress (Deep Slate Leatherette)
       const mattressGeo = new THREE.BoxGeometry(2.3, 0.45, 3.9);
       const mattressMat = new THREE.MeshStandardMaterial({
-        color: 0x1e293b,
-        roughness: 0.8,
+        color: THEME.three.mattress,
+        roughness: 0.6,
         metalness: 0.1,
       });
       const mattress = new THREE.Mesh(mattressGeo, mattressMat);
@@ -242,9 +243,9 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
       mattress.receiveShadow = true;
       bedGroup.add(mattress);
 
-      // Incline Headrest / Pillow
+      // Incline Headrest / White Hospital Pillow
       const pillowGeo = new THREE.BoxGeometry(1.9, 0.2, 0.9);
-      const pillowMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.9 });
+      const pillowMat = new THREE.MeshStandardMaterial({ color: THEME.three.pillow, roughness: 0.9 });
       const pillow = new THREE.Mesh(pillowGeo, pillowMat);
       pillow.position.set(0, 1.25, -1.3);
       pillow.rotation.x = 0.2;
@@ -252,7 +253,7 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
 
       // Headboard & Footboard
       const headboardGeo = new THREE.BoxGeometry(2.4, 1.4, 0.15);
-      const boardMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.5, roughness: 0.4 });
+      const boardMat = new THREE.MeshStandardMaterial({ color: THEME.three.board, metalness: 0.4, roughness: 0.5 });
       const headboard = new THREE.Mesh(headboardGeo, boardMat);
       headboard.position.set(0, 1.1, -2.0);
       headboard.castShadow = true;
@@ -266,14 +267,14 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
 
       // --- C. Bedside Vital Signs Monitor Station ---
       const standGeo = new THREE.CylinderGeometry(0.06, 0.06, 2.8);
-      const standMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8, roughness: 0.2 });
+      const standMat = new THREE.MeshStandardMaterial({ color: THEME.three.monitorStand, metalness: 0.7, roughness: 0.25 });
       const stand = new THREE.Mesh(standGeo, standMat);
       stand.position.set(-1.8, 1.4, -1.2);
       stand.castShadow = true;
       bedGroup.add(stand);
 
       const monitorGeo = new THREE.BoxGeometry(0.9, 0.65, 0.15);
-      const monitorMat = new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.3 });
+      const monitorMat = new THREE.MeshStandardMaterial({ color: THEME.three.monitorCase, roughness: 0.4 });
       const monitor = new THREE.Mesh(monitorGeo, monitorMat);
       monitor.position.set(-1.8, 2.4, -1.2);
       monitor.rotation.y = Math.PI / 5;
@@ -283,9 +284,9 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
       // Emissive Vital Screen
       const screenGeo = new THREE.PlaneGeometry(0.8, 0.55);
       const screenMat = new THREE.MeshStandardMaterial({
-        color: 0x10b981,
-        emissive: 0x10b981,
-        emissiveIntensity: 0.8,
+        color: THEME.three.tier3,
+        emissive: THEME.three.tier3,
+        emissiveIntensity: 0.6,
         roughness: 0.2,
       });
       const screen = new THREE.Mesh(screenGeo, screenMat);
@@ -297,9 +298,9 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
       // --- D. Emergency Beacon Strobe (Top of Monitor Pole) ---
       const beaconGeo = new THREE.CylinderGeometry(0.12, 0.14, 0.22, 16);
       const beaconMat = new THREE.MeshStandardMaterial({
-        color: 0x10b981,
-        emissive: 0x10b981,
-        emissiveIntensity: 0.5,
+        color: THEME.three.tier3,
+        emissive: THEME.three.tier3,
+        emissiveIntensity: 0.4,
         transparent: true,
         opacity: 0.9,
       });
@@ -316,17 +317,17 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
 
       const bagGeo = new THREE.BoxGeometry(0.25, 0.4, 0.1);
       const bagMat = new THREE.MeshStandardMaterial({
-        color: 0xe0f2fe,
+        color: THEME.three.ivBag,
         transparent: true,
-        opacity: 0.6,
+        opacity: 0.75,
         roughness: 0.1,
       });
       const bag = new THREE.Mesh(bagGeo, bagMat);
       bag.position.set(1.8, 2.9, -1.2);
       bedGroup.add(bag);
 
-      // --- F. Dynamic Real-Time PointLight for Emergency Flares ---
-      const bedPointLight = new THREE.PointLight(0x10b981, 1.2, 8.0);
+      // --- F. Dynamic Real-Time PointLight for Emergency Alerts ---
+      const bedPointLight = new THREE.PointLight(THEME.three.tier3, 0.9, 7.0);
       bedPointLight.position.set(0, 2.5, 0);
       bedGroup.add(bedPointLight);
       lightsRef.current.set(bedId, bedPointLight);
@@ -446,26 +447,26 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
         const screenMesh = monitorScreensRef.current.get(bedId);
         if (!bedState) return;
 
-        let targetColor = 0x10b981;
-        let intensity = 1.0;
+        let targetColor: number = THEME.three.tier3;
+        let intensity = 0.8;
 
         if (bedState.signal_status === 'no_signal') {
-          targetColor = 0x64748b;
-          intensity = 0.3;
+          targetColor = THEME.three.offline;
+          intensity = 0.2;
         } else if (bedState.tier === 1) {
-          targetColor = 0xef4444;
+          targetColor = THEME.three.tier1;
           const flash = (Math.sin(elapsed * 12) + 1) / 2;
-          intensity = 2.5 + flash * 3.5;
+          intensity = 1.6 + flash * 2.0;
           beaconMesh.rotation.y += 0.2;
-          beaconMesh.scale.set(1 + flash * 0.3, 1 + flash * 0.3, 1 + flash * 0.3);
+          beaconMesh.scale.set(1 + flash * 0.25, 1 + flash * 0.25, 1 + flash * 0.25);
         } else if (bedState.tier === 2) {
-          targetColor = 0xf59e0b;
+          targetColor = THEME.three.tier2;
           const pulse = (Math.sin(elapsed * 4) + 1) / 2;
-          intensity = 1.8 + pulse * 1.5;
+          intensity = 1.2 + pulse * 1.0;
           beaconMesh.rotation.y += 0.05;
         } else {
           const breath = (Math.sin(elapsed * 1.5) + 1) / 2;
-          intensity = 0.8 + breath * 0.4;
+          intensity = 0.6 + breath * 0.3;
         }
 
         const colorObj = new THREE.Color(targetColor);
@@ -473,7 +474,7 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
         const beaconMat = beaconMesh.material as THREE.MeshStandardMaterial;
         beaconMat.color.copy(colorObj);
         beaconMat.emissive.copy(colorObj);
-        beaconMat.emissiveIntensity = intensity * 0.8;
+        beaconMat.emissiveIntensity = intensity * 0.6;
 
         if (pointLight) {
           pointLight.color.copy(colorObj);
@@ -484,7 +485,7 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
           const sMat = screenMesh.material as THREE.MeshStandardMaterial;
           sMat.color.copy(colorObj);
           sMat.emissive.copy(colorObj);
-          sMat.emissiveIntensity = intensity * 0.7;
+          sMat.emissiveIntensity = intensity * 0.5;
         }
       });
 
@@ -542,26 +543,26 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
   }, [cameraView, selectedBedId]);
 
   return (
-    <div className="relative w-full h-[500px] lg:h-[560px] rounded-3xl overflow-hidden bg-[#070B12] border border-slate-800 shadow-2xl select-none">
+    <div className="relative w-full h-[500px] lg:h-[560px] rounded-3xl overflow-hidden bg-slate-100 border border-slate-300 shadow-md select-none">
       {/* Three.js Canvas Container */}
       <div ref={containerRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
 
       {/* Top Left: 3D Ward Header & Emergency Ticker */}
       <div className="absolute top-4 left-4 pointer-events-none flex flex-col space-y-1.5 z-10">
-        <div className="flex items-center space-x-2 bg-slate-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border border-slate-700/80 shadow-lg pointer-events-auto">
-          <Layers className="w-4 h-4 text-cyan-400 animate-pulse" />
-          <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+        <div className="flex items-center space-x-2 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border border-slate-300 shadow-sm pointer-events-auto">
+          <Layers className="w-4 h-4 text-teal-600 animate-pulse" />
+          <span className="text-xs font-mono font-bold text-slate-800 uppercase tracking-wider">
             3D ICU Ward Room (Alpha Bay)
           </span>
-          <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded-full border border-cyan-800/40">
+          <span className="text-[10px] font-mono text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
             WebGL 60 FPS
           </span>
         </div>
 
         {emergencyBeds.length > 0 && (
-          <div className="flex items-center space-x-2 bg-red-950/90 backdrop-blur-md px-3.5 py-1 rounded-2xl border border-red-500/60 shadow-xl pointer-events-auto animate-pulse">
-            <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
-            <span className="text-[11px] font-mono font-bold text-red-300">
+          <div className="flex items-center space-x-2 bg-red-50/95 backdrop-blur-md px-3.5 py-1 rounded-2xl border border-red-300 shadow-md pointer-events-auto animate-pulse">
+            <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
+            <span className="text-[11px] font-mono font-bold text-red-700">
               {emergencyBeds.length} TIER-1 EMERGENCY:{' '}
               {emergencyBeds.map((b) => b.bed_id.toUpperCase()).join(', ')}
             </span>
@@ -575,10 +576,10 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
         <div className="flex items-center space-x-2 pointer-events-auto">
           <button
             onClick={() => setCameraView('panoramic')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-semibold backdrop-blur-md border transition-all flex items-center space-x-1.5 shadow ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-semibold backdrop-blur-md border transition-all flex items-center space-x-1.5 shadow-sm ${
               cameraView === 'panoramic'
-                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 ring-1 ring-cyan-400/40'
-                : 'bg-slate-900/80 text-slate-400 border-slate-700 hover:text-white'
+                ? 'bg-teal-600 text-white border-teal-600 shadow ring-1 ring-teal-500'
+                : 'bg-white/90 text-slate-700 border-slate-300 hover:bg-slate-50'
             }`}
           >
             <Compass className="w-3.5 h-3.5" />
@@ -587,10 +588,10 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
 
           <button
             onClick={() => setCameraView('topdown')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-semibold backdrop-blur-md border transition-all flex items-center space-x-1.5 shadow ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-semibold backdrop-blur-md border transition-all flex items-center space-x-1.5 shadow-sm ${
               cameraView === 'topdown'
-                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 ring-1 ring-cyan-400/40'
-                : 'bg-slate-900/80 text-slate-400 border-slate-700 hover:text-white'
+                ? 'bg-teal-600 text-white border-teal-600 shadow ring-1 ring-teal-500'
+                : 'bg-white/90 text-slate-700 border-slate-300 hover:bg-slate-50'
             }`}
           >
             <Eye className="w-3.5 h-3.5" />
@@ -599,22 +600,22 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
 
           <button
             onClick={() => setCameraView('emergency')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-semibold backdrop-blur-md border transition-all flex items-center space-x-1.5 shadow ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-semibold backdrop-blur-md border transition-all flex items-center space-x-1.5 shadow-sm ${
               cameraView === 'emergency'
-                ? 'bg-red-500/30 text-red-300 border-red-500/60 ring-1 ring-red-400/40'
-                : 'bg-red-950/40 text-red-400 border-red-800/40 hover:bg-red-900/40'
+                ? 'bg-red-600 text-white border-red-600 ring-1 ring-red-500 shadow'
+                : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
             }`}
           >
-            <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
+            <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
             <span>Emergency Fly-To</span>
           </button>
 
           <button
             onClick={() => setAutoRotate(!autoRotate)}
-            className={`p-2 rounded-xl backdrop-blur-md border transition-all shadow pointer-events-auto ${
+            className={`p-2 rounded-xl backdrop-blur-md border transition-all shadow-sm pointer-events-auto ${
               autoRotate
-                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50'
-                : 'bg-slate-900/80 text-slate-400 border-slate-700 hover:text-white'
+                ? 'bg-teal-600 text-white border-teal-600'
+                : 'bg-white/90 text-slate-600 border-slate-300 hover:bg-slate-50'
             }`}
             title="Toggle Auto-Orbit"
           >
@@ -623,19 +624,19 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
         </div>
 
         {/* Free-Moving Cursor Controls HUD */}
-        <div className="bg-slate-950/85 backdrop-blur-md border border-slate-800/90 px-3 py-1.5 rounded-xl text-[10px] font-mono text-slate-300 flex items-center space-x-3 shadow-lg pointer-events-auto">
-          <span className="flex items-center space-x-1 text-cyan-300">
-            <MousePointer className="w-3 h-3 text-cyan-400" />
+        <div className="bg-white/90 backdrop-blur-md border border-slate-300 px-3 py-1.5 rounded-xl text-[10px] font-mono text-slate-700 flex items-center space-x-3 shadow-sm pointer-events-auto">
+          <span className="flex items-center space-x-1 text-teal-700">
+            <MousePointer className="w-3 h-3 text-teal-600" />
             <span>Left Drag: Orbit 360°</span>
           </span>
-          <span className="text-slate-600">|</span>
-          <span className="flex items-center space-x-1 text-slate-300">
-            <ZoomIn className="w-3 h-3 text-cyan-400" />
+          <span className="text-slate-300">|</span>
+          <span className="flex items-center space-x-1 text-slate-600">
+            <ZoomIn className="w-3 h-3 text-teal-600" />
             <span>Scroll: Zoom In/Out</span>
           </span>
-          <span className="text-slate-600">|</span>
-          <span className="flex items-center space-x-1 text-slate-300">
-            <Move className="w-3 h-3 text-cyan-400" />
+          <span className="text-slate-300">|</span>
+          <span className="flex items-center space-x-1 text-slate-600">
+            <Move className="w-3 h-3 text-teal-600" />
             <span>Right Drag: Pan</span>
           </span>
         </div>
@@ -643,7 +644,7 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
 
       {/* Bottom Bar: Interactive Bed Navigator Pill Strip */}
       <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none z-10">
-        <div className="flex items-center space-x-1.5 overflow-x-auto p-1.5 bg-slate-950/85 backdrop-blur-xl rounded-2xl border border-slate-800 pointer-events-auto shadow-2xl">
+        <div className="flex items-center space-x-1.5 overflow-x-auto p-1.5 bg-white/90 backdrop-blur-xl rounded-2xl border border-slate-300 pointer-events-auto shadow-md">
           {Array.from({ length: 10 }, (_, i) => {
             const bId = `bed-${String(i + 1).padStart(2, '0')}`;
             const bState = beds[bId];
@@ -658,24 +659,26 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
                   onSelectBed(bId);
                   setCameraView('focus');
                 }}
-                className={`px-2.5 py-1.5 rounded-xl font-mono text-[11px] font-bold transition-all flex items-center space-x-1.5 border ${
+                className={`px-2.5 py-1.5 rounded-xl font-mono text-[11px] font-bold transition-all flex items-center space-x-1.5 border shadow-sm ${
                   isSelected
-                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400 shadow-md ring-1 ring-cyan-400'
+                    ? 'bg-teal-600 text-white border-teal-600 shadow ring-1 ring-teal-500'
                     : isCrit
-                    ? 'bg-red-950/80 text-red-300 border-red-500 animate-pulse'
+                    ? 'bg-red-50 text-red-700 border-red-300 animate-pulse'
                     : isAnom
-                    ? 'bg-amber-950/60 text-amber-300 border-amber-500/50'
-                    : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-white'
+                    ? 'bg-amber-50 text-amber-800 border-amber-300'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
                 <span
                   className={`w-2 h-2 rounded-full ${
-                    isCrit ? 'bg-red-400 animate-ping' : isAnom ? 'bg-amber-400' : 'bg-emerald-400'
+                    isCrit ? 'bg-red-600 animate-ping' : isAnom ? 'bg-amber-500' : 'bg-emerald-500'
                   }`}
                 />
                 <span>{bId.toUpperCase()}</span>
                 {bState?.tick && (
-                  <span className="text-[9px] opacity-75">{bState.tick.hr} bpm</span>
+                  <span className={`text-[9px] ${isSelected ? 'text-teal-100' : 'text-slate-500'}`}>
+                    {bState.tick.hr} bpm
+                  </span>
                 )}
               </button>
             );
@@ -683,11 +686,12 @@ export const ICUWard3D: React.FC<ICUWard3DProps> = ({
         </div>
 
         {hoveredBedId && (
-          <div className="bg-cyan-950/90 backdrop-blur-md border border-cyan-500/50 px-3 py-1.5 rounded-xl text-xs font-mono text-cyan-300 shadow-xl pointer-events-auto animate-fadeIn">
-            Click to fly into <strong className="text-white">{hoveredBedId.toUpperCase()}</strong>
+          <div className="bg-white/95 backdrop-blur-md border border-teal-400 px-3 py-1.5 rounded-xl text-xs font-mono text-teal-800 shadow-md pointer-events-auto animate-fadeIn">
+            Click to fly into <strong className="text-teal-900 font-extrabold">{hoveredBedId.toUpperCase()}</strong>
           </div>
         )}
       </div>
     </div>
   );
 };
+
