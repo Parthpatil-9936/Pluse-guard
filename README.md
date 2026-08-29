@@ -4,8 +4,8 @@
 
 A 10-bed ICU monitoring prototype that filters out non-actionable alarm noise using multi-vital anomaly scoring, and keeps triaging safely even with **zero cloud connectivity**.
 
-> ⚠️ **Hackathon Prototype Notice**
-> Built in 36 hours as a ~10% proof-of-concept slice of the full PulseGuard-AI vision, per hackathon scope rules. Not a diagnostic device, not clinically validated, not for real patient use.
+> ⚠️ **This is a Hackathon Prototype — Not a Final Product**
+> Built in 36 hours as a ~10% proof-of-concept slice of the full PulseGuard-AI vision, per hackathon scope rules. It exists to demonstrate the core architecture and alarm-tiering logic, not to ship as-is. Not a diagnostic device, not clinically validated, not tested with real patients, and not production-hardened.
 
 ---
 
@@ -15,13 +15,11 @@ A 10-bed ICU monitoring prototype that filters out non-actionable alarm noise us
 - Alarm fatigue is on ECRI's **Top 10 Health Technology Hazards** list.
 - Cloud-first monitoring platforms go dark during network outages or cyber incidents — exactly when reliability matters most.
 
-## What It Does
+## What This Prototype Demonstrates
 
 - Ingests simulated ECG, SpO₂, and BP telemetry for 10 ICU beds.
-- Filters noise and scores anomalies locally (Redis sliding window + Isolation Forest, `<5ms`).
 - Routes every event through a **3-tier alarm cascade** so only real events reach a nurse.
 - Live React dashboard with a false-alarm suppression counter.
-- Immutable PostgreSQL audit trail for every alert, override, and mute.
 - **100% of the alarm path runs on local edge hardware** — cloud is used only for async reporting.
 
 ## Scope
@@ -64,9 +62,7 @@ Hard thresholds and ML run in parallel and are **OR'd** — the model can never 
 ```bash
 git clone https://github.com/<your-org>/pulseguard-ai.git
 cd pulseguard-ai
-cp .env.example .env
-docker-compose up --build
-```
+-- To be updated
 
 Then check all containers are healthy:
 
@@ -82,14 +78,9 @@ docker-compose down
 
 > Ports/commands may need adjusting to match the final repo scripts.
 
-## Acceptance Checklist
+## Disclaimer
 
-- [ ] All 4 containers healthy with no manual intervention
-- [ ] Tier-1 event alarms within 5s, unsuppressable
-- [ ] Tier-3 event stays silent but logs to audit feed
-- [ ] Suppression counter reads >75% after a 5-min run
-- [ ] Cloud outage simulation → zero change in alarm behavior
-- [ ] Killing Redis/Postgres mid-run doesn't break the alarm path
+This repo is a **hackathon proof-of-concept**, not a finished or deployable product. It's meant to prove the edge-triage architecture works end-to-end — the full vision (see [Scope](#scope)) is intentionally out of reach for a 36-hour build.
 
 ## Team
 
