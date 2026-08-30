@@ -9,8 +9,22 @@ import { ICUWard3D } from './components/3d/ICUWard3D';
 import { BedState, AuditLogItem, TelemetryTick, AlertEvent } from './types';
 import { medicalAudio } from './services/audioAlerts';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/alerts';
+const getBackendUrl = (): string => {
+  if (import.meta.env.VITE_BACKEND_URL) return import.meta.env.VITE_BACKEND_URL;
+  const host = typeof window !== 'undefined' && window.location.hostname ? window.location.hostname : 'localhost';
+  const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'https:' : 'http:';
+  return `${protocol}//${host}:8000`;
+};
+
+const getWsUrl = (): string => {
+  if (import.meta.env.VITE_WS_URL) return import.meta.env.VITE_WS_URL;
+  const host = typeof window !== 'undefined' && window.location.hostname ? window.location.hostname : 'localhost';
+  const wsProtocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  return `${wsProtocol}//${host}:8000/ws/alerts`;
+};
+
+const BACKEND_URL = getBackendUrl();
+const WS_URL = getWsUrl();
 
 export function App() {
   const [cloudOnline, setCloudOnline] = useState(true);
