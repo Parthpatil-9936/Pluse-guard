@@ -51,11 +51,9 @@ Hard thresholds and ML run in parallel and are **OR'd** — the model can never 
 
 ## Demo Preview
 
-> 📸 *Screenshots / demo GIF go here*
-
-![Quiet dashboard](docs/screenshots/dashboard-quiet.png)
-![Tier-1 alert firing](docs/screenshots/tier1-alert.png)
-![Cloud outage mode](docs/screenshots/cloud-outage.png)
+![Quiet dashboard](Assets/Quiet-Dashboard.jpeg)
+![Tier-1 alert firing](Assets/Tier-1.png)
+![Cloud outage mode](Assets/Cloud.png)
 
 ## Run Locally
 
