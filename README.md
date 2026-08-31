@@ -51,9 +51,11 @@ Hard thresholds and ML run in parallel and are **OR'd** — the model can never 
 
 ## Demo Preview
 
-![Quiet dashboard](Assets/Quiet-Dashboard.jpeg)
-![Tier-1 alert firing](Assets/Tier-1.png)
-![Cloud outage mode](Assets/Cloud.png)
+<p align="center">
+  <img src="Assets/Quiet-Dashboard.jpeg" alt="Quiet dashboard" width="70%">
+  <img src="Assets/Tier-1.png" alt="Tier-1 alert firing" width="70%">
+  <img src="Assets/Cloud.png" alt="Cloud outage mode" width="70%">
+</p>
 
 ## Run Locally
 
