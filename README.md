@@ -4,7 +4,7 @@
 
 A 10-bed ICU monitoring prototype that filters out non-actionable alarm noise using multi-vital anomaly scoring, and keeps triaging safely even with **zero cloud connectivity**.
 
-> ⚠️ **This is a Hackathon Prototype — Not a Final Product**
+> ⚠️ **This is a Hackathon Prototype — Not a Final Product**  
 > Built in 36 hours as a ~10% proof-of-concept slice of the full PulseGuard-AI vision, per hackathon scope rules. It exists to demonstrate the core architecture and alarm-tiering logic, not to ship as-is. Not a diagnostic device, not clinically validated, not tested with real patients, and not production-hardened.
 
 ---
@@ -59,24 +59,86 @@ Hard thresholds and ML run in parallel and are **OR'd** — the model can never 
 
 ## Run Locally
 
+### ⚡ 1-Click Unified Launch (Recommended for Any System)
+
+Clone the repository and run the automated launcher for your operating system:
+
 ```bash
 git clone https://github.com/<your-org>/pulseguard-ai.git
 cd pulseguard-ai
--- To be updated
+```
 
-Then check all containers are healthy:
+#### 🪟 Windows
+Simply **double-click** `start.bat` or run:
+```cmd
+.\start.bat
+```
+*(Or in PowerShell: `.\start.ps1`)*
+
+#### 🐍 Any OS (Cross-Platform Python)
+```bash
+python run.py
+```
+
+#### 🍎 macOS / 🐧 Linux
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+> **What the launcher handles automatically:**
+> - Checks Python (3.10+) and Node.js (18+) dependencies.
+> - Automatically runs `npm install` on first launch.
+> - Auto-cleans ports `8000` (FastAPI) and `3000` (Vite) to prevent port conflicts.
+> - Discovers and displays your local WiFi/LAN IP for mobile & teammate testing.
+> - Simultaneously starts both backend and frontend servers with unified color-coded logs.
+> - Automatically opens **http://localhost:3000** in your default browser.
+
+---
+
+### 🛑 How to Stop Servers & Free Ports
+
+- In terminal: Press `Ctrl + C`.
+- On Windows: Double-click `stop.bat` to instantly terminate all servers and release ports `8000` and `3000`.
+- On macOS/Linux: Run `./stop.sh`.
+
+---
+
+### 🛠️ Manual Terminal Run (Optional)
+
+If you prefer running backend and frontend in separate terminal windows:
+
+**Terminal 1: Backend (FastAPI)**
+```bash
+cd backend
+python -m pip install -r requirements.txt
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+**Terminal 2: Frontend (Vite + React)**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+### 🐳 Docker Compose (Optional)
+
+To spin up the containerized stack (PostgreSQL, Redis, Gateway, Frontend):
 
 ```bash
+docker-compose up --build -d
 docker-compose ps
 ```
 
-Open the dashboard at **http://localhost:3000**, inject a test event from the simulator, and try the **"Simulate Cloud Outage"** button.
-
+To stop all containers:
 ```bash
 docker-compose down
 ```
 
-> Ports/commands may need adjusting to match the final repo scripts.
+---
 
 ## Disclaimer
 
