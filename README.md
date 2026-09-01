@@ -57,6 +57,17 @@ Hard thresholds and ML run in parallel and are **OR'd** — the model can never 
   <img src="Assets/Cloud.png" alt="Cloud outage mode" width="70%">
 </p>
 
+<h1>Prerequisites</h1>
+Before you begin, ensure you have the following installed on your system:
+
+Git: To clone the repository.
+
+Python 3.10+: Required for the FastAPI backend and scikit-learn ML models.
+
+Node.js 18+ & npm: Required to build and run the React/Vite frontend.
+
+Docker & Docker Compose (Optional but recommended): Required if you plan to spin up the full containerized stack, including PostgreSQL and Redis.
+
 ## Run Locally
 
 ### ⚡ 1-Click Unified Launch (Recommended for Any System)
