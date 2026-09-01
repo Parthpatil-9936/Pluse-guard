@@ -51,9 +51,22 @@ Hard thresholds and ML run in parallel and are **OR'd** — the model can never 
 
 ## Demo Preview
 
-![Quiet dashboard](Assets/Quiet-Dashboard.jpeg)
-![Tier-1 alert firing](Assets/Tier-1.png)
-![Cloud outage mode](Assets/Cloud.png)
+<p align="center">
+  <img src="Assets/Quiet-Dashboard.jpeg" alt="Quiet dashboard" width="70%">
+  <img src="Assets/Tier-1.png" alt="Tier-1 alert firing" width="70%">
+  <img src="Assets/Cloud.png" alt="Cloud outage mode" width="70%">
+</p>
+
+<h1>Prerequisites</h1>
+Before you begin, ensure you have the following installed on your system:
+
+Git: To clone the repository.
+
+Python 3.10+: Required for the FastAPI backend and scikit-learn ML models.
+
+Node.js 18+ & npm: Required to build and run the React/Vite frontend.
+
+Docker & Docker Compose (Optional but recommended): Required if you plan to spin up the full containerized stack, including PostgreSQL and Redis.
 
 ## Run Locally
 
