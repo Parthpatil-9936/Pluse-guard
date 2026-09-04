@@ -124,7 +124,33 @@ def stream_output(process, prefix, color):
         pass
 
 def check_dependencies():
-    # Check Frontend node_modules
+    # 1. Check Python backend packages
+    required_packages = ["fastapi", "uvicorn", "sqlalchemy", "pydantic", "pydantic_settings", "jwt", "aiosqlite"]
+    missing = []
+    for pkg in required_packages:
+        try:
+            __import__(pkg)
+        except ImportError:
+            missing.append(pkg)
+    
+    if missing:
+        print(f"{YELLOW}[Setup] Missing Python packages ({', '.join(missing)}). Installing backend dependencies...{RESET}", flush=True)
+        req_file = BACKEND_DIR / "requirements.txt"
+        try:
+            subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "pip"], check=False)
+            subprocess.run([sys.executable, "-m", "pip", "install", "-r", str(req_file)], check=True)
+            print(f"{GREEN}[Setup] Backend Python dependencies installed successfully!{RESET}", flush=True)
+        except subprocess.CalledProcessError as e:
+            print(f"{RED}[Error] Failed to install backend dependencies.{RESET}", flush=True)
+            if sys.version_info >= (3, 13):
+                print(f"{YELLOW}[Notice] Python {sys.version.split()[0]} detected. Some C-extensions require pre-built wheels from Python 3.11 or 3.12.{RESET}", flush=True)
+                print(f"{YELLOW}[Solution] We recommend creating a Python 3.11/3.12 virtual environment:{RESET}", flush=True)
+                print(f"  {CYAN}py -3.11 -m venv .venv{RESET}  (or py -3.12 -m venv .venv)")
+                print(f"  {CYAN}.\\.venv\\Scripts\\activate{RESET}")
+                print(f"  {CYAN}pip install -r backend/requirements.txt{RESET}\n")
+            raise e
+
+    # 2. Check Frontend node_modules
     node_modules = FRONTEND_DIR / "node_modules"
     if not node_modules.exists():
         print(f"{YELLOW}[Setup] node_modules not found in frontend. Running 'npm install'...{RESET}", flush=True)

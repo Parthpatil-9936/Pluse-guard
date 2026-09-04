@@ -57,27 +57,66 @@ Hard thresholds and ML run in parallel and are **OR'd** — the model can never 
   <img src="Assets/Cloud.png" alt="Cloud outage mode" width="70%">
 </p>
 
-<h1>Prerequisites</h1>
+## Prerequisites
+
 Before you begin, ensure you have the following installed on your system:
 
-Git: To clone the repository.
+- **Git**: To clone the repository.
+- **Python 3.10 – 3.12 (Recommended: Python 3.11 or 3.12)**: Required for the FastAPI backend and scikit-learn ML models.
+  > 💡 **Why Python 3.11/3.12?** Pre-compiled binary wheels are readily available on PyPI for all C-extensions (`asyncpg`, `scikit-learn`, `numpy`). Newer versions like Python 3.13 may attempt source compilation and require C++ build tools or PostgreSQL headers.
+- **Node.js 18+ & npm**: Required to build and run the React/Vite frontend.
+- **Docker & Docker Compose (Optional)**: If you plan to spin up the containerized stack with external PostgreSQL and Redis.
 
-Python 3.10+: Required for the FastAPI backend and scikit-learn ML models.
+---
 
-Node.js 18+ & npm: Required to build and run the React/Vite frontend.
+## Getting Started & Installation
 
-Docker & Docker Compose (Optional but recommended): Required if you plan to spin up the full containerized stack, including PostgreSQL and Redis.
+### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/Parthpatil-9936/Pluse-guard.git
+cd Pluse-guard
+```
+
+### Step 2: Set Up Python Virtual Environment (Recommended)
+
+Using a virtual environment with **Python 3.11 or 3.12** prevents version conflicts and avoids C-wheel build errors:
+
+#### 🪟 Windows (Command Prompt or PowerShell)
+```powershell
+# Create venv using Python 3.11 or 3.12 (if multiple Python versions installed):
+py -3.11 -m venv .venv
+# (Or if 3.11 isn't specifically registered, use default python):
+python -m venv .venv
+
+# Activate the virtual environment:
+.\.venv\Scripts\activate
+
+# Install backend dependencies:
+python -m pip install --upgrade pip
+python -m pip install -r backend/requirements.txt
+```
+
+#### 🍎 macOS / 🐧 Linux
+```bash
+# Create venv using Python 3.11 or 3.12:
+python3.11 -m venv .venv   # or python3.12 -m venv .venv
+
+# Activate the virtual environment:
+source .venv/bin/activate
+
+# Install backend dependencies:
+pip install --upgrade pip
+pip install -r backend/requirements.txt
+```
+
+---
 
 ## Run Locally
 
-### ⚡ 1-Click Unified Launch (Recommended for Any System)
+### ⚡ 1-Click Unified Launch (Easiest & Recommended)
 
-Clone the repository and run the automated launcher for your operating system:
-
-```bash
-git clone https://github.com/<your-org>/pulseguard-ai.git
-cd pulseguard-ai
-```
+The automated launchers detect your virtual environment (`.venv`), check dependencies, free ports `8000` and `3000`, launch both backend and frontend, and open your browser automatically.
 
 #### 🪟 Windows
 Simply **double-click** `start.bat` or run:
@@ -86,7 +125,7 @@ Simply **double-click** `start.bat` or run:
 ```
 *(Or in PowerShell: `.\start.ps1`)*
 
-#### 🐍 Any OS (Cross-Platform Python)
+#### 🐍 Cross-Platform (Any OS)
 ```bash
 python run.py
 ```
@@ -98,7 +137,8 @@ chmod +x start.sh
 ```
 
 > **What the launcher handles automatically:**
-> - Checks Python (3.10+) and Node.js (18+) dependencies.
+> - Auto-detects and activates `.venv` or `venv` if present.
+> - Checks Python and Node.js dependencies.
 > - Automatically runs `npm install` on first launch.
 > - Auto-cleans ports `8000` (FastAPI) and `3000` (Vite) to prevent port conflicts.
 > - Discovers and displays your local WiFi/LAN IP for mobile & teammate testing.
@@ -121,6 +161,10 @@ If you prefer running backend and frontend in separate terminal windows:
 
 **Terminal 1: Backend (FastAPI)**
 ```bash
+# Activate your virtual environment first (if created):
+# Windows: .\.venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
+
 cd backend
 python -m pip install -r requirements.txt
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
@@ -148,6 +192,28 @@ To stop all containers:
 ```bash
 docker-compose down
 ```
+
+---
+
+## ❓ Troubleshooting & FAQs
+
+### Q1: `Error: pg_config executable not found` or `Failed to build wheel for psycopg2-binary / asyncpg`
+- **Cause**: This happens when running **Python 3.13+** on Windows without pre-compiled binary wheels on PyPI, or if an older commit still contains `psycopg2-binary` in `requirements.txt`.
+- **Solution**:
+  1. Make sure you ran `git pull` to fetch the updated `backend/requirements.txt` (PulseGuard uses `asyncpg` + `aiosqlite`; `psycopg2` is not required).
+  2. Create a virtual environment using **Python 3.11** or **Python 3.12**:
+     ```powershell
+     py -3.11 -m venv .venv
+     .\.venv\Scripts\activate
+     python -m pip install --upgrade pip
+     python -m pip install -r backend/requirements.txt
+     ```
+
+### Q2: Port 8000 or 3000 is already in use
+- **Solution**: Run `stop.bat` (on Windows) or `./stop.sh` (on macOS/Linux). The scripts will search for and terminate any lingering processes bound to ports `8000` or `3000`.
+
+### Q3: Do I need Docker, PostgreSQL, or Redis running?
+- **Answer**: **No!** PulseGuard includes an automatic fallback to an in-process SQLite database (`aiosqlite`) and in-memory buffer. The backend will start and function completely standalone without external containers.
 
 ---
 

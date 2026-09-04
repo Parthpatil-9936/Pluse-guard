@@ -72,9 +72,45 @@ npm run dev
 
 ---
 
-## 🔧 Prerequisites
+## 🔧 Prerequisites & Environment Setup
 
-- **Python 3.10+** (Includes SQLite async engine fallback)
+- **Python 3.10 – 3.12 (Recommended: 3.11 or 3.12)**
 - **Node.js 18+** & **npm**
 
-*(Docker & Postgres/Redis are optional; the app automatically runs in self-contained SQLite + in-process ring buffer mode when external services are not active).*
+### 🐍 Setting Up a Virtual Environment (Recommended)
+
+To avoid C-extension build errors (such as `pg_config executable not found` on newer Python 3.13), create and use a Python 3.11 or 3.12 virtual environment:
+
+#### 🪟 Windows (PowerShell / Command Prompt):
+```powershell
+# Create virtual environment (.venv)
+py -3.11 -m venv .venv
+
+# Activate it:
+.\.venv\Scripts\activate
+
+# Install dependencies:
+python -m pip install --upgrade pip
+python -m pip install -r backend/requirements.txt
+```
+
+#### 🍎 macOS / 🐧 Linux:
+```bash
+python3.11 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r backend/requirements.txt
+```
+
+*(Note: [`start.bat`](file:///d:/Pluse%20Guard/start.bat), [`start.ps1`](file:///d:/Pluse%20Guard/start.ps1), and [`start.sh`](file:///d:/Pluse%20Guard/start.sh) will automatically detect and activate `.venv` if it exists!)*
+
+---
+
+## ❓ Common Troubleshooting
+
+- **`Error: pg_config executable not found` or `Failed to build wheel`:**
+  - This occurs if you are running **Python 3.13+** on Windows without pre-compiled wheels, or if you have an older clone containing `psycopg2-binary`.
+  - **Fix**: Run `git pull` to fetch the latest `backend/requirements.txt` (which uses pure `asyncpg` + `aiosqlite`), and install in a Python 3.11/3.12 venv as shown above.
+- **Port 8000 or 3000 in use:**
+  - Double-click [`stop.bat`](file:///d:/Pluse%20Guard/stop.bat) on Windows or run `./stop.sh` on Mac/Linux.
+
