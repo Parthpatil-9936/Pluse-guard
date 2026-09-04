@@ -74,8 +74,8 @@ Before you begin, ensure you have the following installed on your system:
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/Parthpatil-9936/Pluse-guard.git
-cd Pluse-guard
+git clone https://github.com/Parthpatil-9936/Pulse-guard.git
+cd Pulse-guard
 ```
 
 ### Step 2: Set Up Python Virtual Environment (Recommended)
